@@ -342,7 +342,7 @@ select
 	count(course_id) as total
 from "COURSE_BOOKING"
 where 
-	status = '上課中' and
+	status != '課程已取消' and
 	user_id = (
 		select id from "USER" 
 		where "name" = '王小明' and "email"='wXlTq@hexschooltest.io'
@@ -409,6 +409,18 @@ inner join
 	inner join "COACH_LINK_SKILL" on "COACH_LINK_SKILL".skill_id = "SKILL".id
 ) as "COACH_SKILL" on "COACH_SKILL".coach_skill = '重訓'
 order by coach_exp desc;
+
+--其他寫法(有用到子查詢)
+select 
+	"USER".name as coach_name,
+	"COACH".experience_years  as coach_exp,
+	"SKILL".name as coach_skill
+from "COACH_LINK_SKILL"
+inner join "COACH" on "COACH".id = "COACH_LINK_SKILL".coach_id
+inner join "USER" on "USER".id = "COACH".user_id
+inner join "SKILL" on "SKILL".id = "COACH_LINK_SKILL".skill_id
+where "COACH_LINK_SKILL".skill_id = (select id from "SKILL" where "name" = '重訓')
+order by "COACH".experience_years desc;
 
 -- 6-2 查詢：查詢每種專長的教練數量，並只列出教練數量最多的專長（需使用 group by, inner join 與 order by 與 limit 語法）
 -- 顯示須包含以下欄位： 專長名稱, coach_total
